@@ -1,0 +1,6 @@
+{
+  "name": "FinServe EPLMS",
+  "description": "Employee Performance & Leave Management System with role-based access, automated leave strategies, and performance tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Employee profile and metadata",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["EMPLOYEE", "TEAM_LEAD", "HR_MANAGER", "ADMIN"] },
+        "department": { "type": "string" },
+        "totalLeave": { "type": "number" },
+        "usedLeave": { "type": "number" }
+      },
+      "required": ["name", "email", "role"]
+    },
+    "LeaveRequest": {
+      "title": "Leave Request",
+      "description": "Employee request for time off",
+      "type": "object",
+      "properties": {
+        "employeeId": { "type": "string" },
+        "employeeName": { "type": "string" },
+        "startDate": { "type": "string", "format": "date" },
+        "endDate": { "type": "string", "format": "date" },
+        "type": { "type": "string", "enum": ["ANNUAL", "SICK", "PERSONAL"] },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED", "ESCALATED"] },
+        "reason": { "type": "string" },
+        "days": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "approvedBy": { "type": "string" },
+        "comments": { "type": "string" }
+      },
+      "required": ["employeeId", "startDate", "endDate", "type", "status", "days"]
+    },
+    "PerformanceGoal": {
+      "title": "Performance Goal",
+      "description": "Goal set for an employee",
+      "type": "object",
+      "properties": {
+        "employeeId": { "type": "string" },
+        "description": { "type": "string" },
+        "deadline": { "type": "string", "format": "date" },
+        "status": { "type": "string", "enum": ["NOT_STARTED", "IN_PROGRESS", "COMPLETED"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["employeeId", "description", "deadline", "status"]
+    },
+    "PerformanceReview": {
+      "title": "Performance Review",
+      "description": "Self or Manager review",
+      "type": "object",
+      "properties": {
+        "employeeId": { "type": "string" },
+        "reviewerId": { "type": "string" },
+        "type": { "type": "string", "enum": ["SELF", "MANAGER"] },
+        "rating": { "type": "number" },
+        "comments": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["employeeId", "reviewerId", "type", "rating", "comments"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/leave_requests/{requestId}": {
+      "schema": "LeaveRequest",
+      "description": "Leave requests"
+    },
+    "/performance_goals/{goalId}": {
+      "schema": "PerformanceGoal",
+      "description": "Performance goals"
+    },
+    "/performance_reviews/{reviewId}": {
+      "schema": "PerformanceReview",
+      "description": "Performance reviews"
+    }
+  }
+}

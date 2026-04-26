@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    restart: always
+
+# Note: This project uses Firebase/Firestore for database management as per instructions.
+# If you wish to use MySQL, you would need to implement the repository layer for it.
