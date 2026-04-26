@@ -59,6 +59,20 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["employeeId", "reviewerId", "type", "rating", "comments"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "In-app alert",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["INFO", "SUCCESS", "WARNING", "ERROR"] },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "message", "type", "read"]
     }
   },
   "firestore": {
@@ -77,6 +91,10 @@
     "/performance_reviews/{reviewId}": {
       "schema": "PerformanceReview",
       "description": "Performance reviews"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "In-app notifications"
     }
   }
 }

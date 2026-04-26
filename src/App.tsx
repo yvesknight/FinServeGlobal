@@ -146,6 +146,12 @@ export default function App() {
             icon={<Target size={20} />} 
             label="Performance" 
           />
+          <SidebarItem 
+            active={activeTab === 'notifications'} 
+            onClick={() => setActiveTab('notifications')} 
+            icon={<Bell size={20} />} 
+            label="Notifications" 
+          />
           {(user.role === UserRole.HR_MANAGER || user.role === UserRole.ADMIN) && (
             <SidebarItem 
               active={activeTab === 'reports'} 
@@ -180,12 +186,14 @@ export default function App() {
               {activeTab === 'dashboard' && 'Welcome Back,'}
               {activeTab === 'leave' && 'Leave Management'}
               {activeTab === 'performance' && 'Performance Reviews'}
+              {activeTab === 'notifications' && 'Notifications'}
               {activeTab === 'reports' && 'Employee Directory'}
             </h1>
             <p className="text-slate-500 mt-1">
               {activeTab === 'dashboard' && 'Here is what\'s happening in your department today.'}
               {activeTab === 'leave' && 'Submit, track and manage your time off requests.'}
               {activeTab === 'performance' && 'Track goals and complete performance reviews.'}
+              {activeTab === 'notifications' && 'Stay updated with system alerts and status changes.'}
               {activeTab === 'reports' && 'Manage employee profiles and roles.'}
             </p>
           </div>
@@ -202,6 +210,7 @@ export default function App() {
           {activeTab === 'dashboard' && <DashboardView user={user} />}
           {activeTab === 'leave' && <LeaveView user={user} />}
           {activeTab === 'performance' && <PerformanceView user={user} />}
+          {activeTab === 'notifications' && <NotificationsView user={user} />}
         </AnimatePresence>
       </main>
     </div>
@@ -579,5 +588,50 @@ function StatusBadge({ status }: { status: string }) {
     <span className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider ${styles[status] || styles.PENDING}`}>
       {status.replace('_', ' ')}
     </span>
+  );
+}
+
+function NotificationsView({ user }: { user: UserProfile }) {
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    const q = query(collection(db, 'notifications'), where('userId', '==', user.uid));
+    return onSnapshot(q, (snap) => {
+      setNotifications(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a: any, b: any) => b.createdAt?.seconds - a.createdAt?.seconds));
+    });
+  }, [user.uid]);
+
+  const icons = {
+    SUCCESS: <CheckCircle2 className="text-emerald-500" />,
+    ERROR: <XCircle className="text-rose-500" />,
+    INFO: <AlertCircle className="text-blue-500" />,
+    WARNING: <AlertCircle className="text-amber-500" />
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 max-w-3xl">
+      {notifications.map(notif => (
+          <div key={notif.id} className={`card p-6 flex gap-4 ${notif.read ? 'opacity-60' : 'border-l-4 border-l-primary-500'}`}>
+            <div className="mt-1">
+              {(icons as any)[notif.type] || icons.INFO}
+            </div>
+            <div className="flex-1">
+              <div className="flex justify-between items-start mb-1">
+                <h5 className="font-bold text-slate-800">{notif.title}</h5>
+                <span className="text-xs text-slate-400">
+                   {notif.createdAt?.toDate ? notif.createdAt.toDate().toLocaleString() : 'Just now'}
+                </span>
+              </div>
+              <p className="text-slate-600 mb-2 leading-relaxed">{notif.message}</p>
+            </div>
+          </div>
+      ))}
+      {notifications.length === 0 && (
+        <div className="card p-12 text-center text-slate-400">
+          <Bell size={48} className="mx-auto mb-4 opacity-20" />
+          <p>No notifications yet.</p>
+        </div>
+      )}
+    </motion.div>
   );
 }

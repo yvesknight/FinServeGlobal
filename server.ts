@@ -125,6 +125,16 @@ async function startServer() {
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       });
 
+      // Notify User
+      await db.collection("notifications").add({
+        userId: leaveData?.employeeId,
+        title: "Leave Approved",
+        message: `Your leave request for ${leaveData?.days} days has been approved.`,
+        type: "SUCCESS",
+        read: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
       // Update used leave balance
       await db.collection("users").doc(leaveData?.employeeId).update({
         usedLeave: admin.firestore.FieldValue.increment(leaveData?.days || 0)
@@ -145,6 +155,20 @@ async function startServer() {
         comments: reason,
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
       });
+
+      const leaveDoc = await db.collection("leave_requests").doc(id).get();
+      const leaveData = leaveDoc.data();
+
+      // Notify User
+      await db.collection("notifications").add({
+        userId: leaveData?.employeeId,
+        title: "Leave Rejected",
+        message: `Your leave request for ${leaveData?.days} days was rejected. Reason: ${reason}`,
+        type: "ERROR",
+        read: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
       res.json({ message: "Leave rejected successfully" });
     } catch (error: any) {
       res.status(500).json({ error: error.message });

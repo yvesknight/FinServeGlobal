@@ -40,5 +40,12 @@ service cloud.firestore {
       allow update: if isHR() || isAdmin();
       allow delete: if isAdmin();
     }
+
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && isOwner(resource.data.userId);
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && isOwner(resource.data.userId);
+      allow delete: if isSignedIn() && isOwner(resource.data.userId);
+    }
   }
 }
